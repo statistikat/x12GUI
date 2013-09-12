@@ -14,7 +14,7 @@ Imports:
     lattice,stringr
 Description: A graphical user interface for the x12 package
 License: GPL (>= 2)
-URL: http://www.r-project.org
+URL: https://github.com/alexkowa/x12GUI
 Collate:
     'helper.R'
     'plotgui.R'
