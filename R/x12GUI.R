@@ -5387,7 +5387,13 @@ x12GUI <- function(x12orig,...){
 	#######################################################
 	gSignalConnect(button.update, "released", f=update_handler)
 #	panel.ts$PackStart(button.update,expand=FALSE)
-	panel.ts$PackStart(table.ts,expand=TRUE)
+  panel.ts.scrolled <- gtkScrolledWindow()
+  
+  panel.ts.scrolled$SetPolicy("GTK_POLICY_NEVER","GTK_POLICY_ALWAYS")
+  panel.ts.scrolled$AddWithViewport(table.ts)
+  panel.ts$PackStart(panel.ts.scrolled)
+  
+	#panel.ts$PackStart(table.ts,expand=TRUE)
 	panel.ts$PackStart(frame.history, expand=FALSE)
 	
 	#######################################################
