@@ -6,9 +6,9 @@ Author: Daniel Schopfhauser, Alexander Kowarik
     <alexander.kowarik@statistik.gv.at>, Angelika Meraner
 Maintainer: Alexander Kowarik <alexander.kowarik@statistik.gv.at>
 Depends:
-    R (>= 2.14.0),stats,utils,grDevices,datasets
+    R (>= 2.14.0),stats,utils,grDevices,datasets,x12 (>= 1.1-0)
 Imports:
-    methods,Hmisc,RGtk2,x12 (>= 1.1-0),
+    methods,Hmisc,RGtk2,
     cairoDevice,
     grid,
     lattice,stringr
