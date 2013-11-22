@@ -38,6 +38,7 @@
 #' @import grid
 #' @import lattice
 #' @import stringr
+#' @import x12
 #' @export x12GUI
 x12GUI <- function(x12orig,...){
   window.main <- gtkWindow("x12 GUI")

@@ -1,5 +1,6 @@
 import(methods)
 import(RGtk2)
+import(x12)
 export(x12GUI)
 import(cairoDevice)
 import(grid)
