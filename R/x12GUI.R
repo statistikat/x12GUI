@@ -3,7 +3,6 @@
 #' 
 #' GUI
 #' 
-#' 
 #' @param x12orig object of class x12Batch or x12Single
 #' @param \dots further arguments (currently ignored).
 #' @author Daniel Schopfhauser
