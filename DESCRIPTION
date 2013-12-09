@@ -1,21 +1,21 @@
-Package: x12GUI
-Version: 0.9.4
-Date: 2013-10-24
-Title: X12 - Graphical User Interface
-Author: Daniel Schopfhauser, Alexander Kowarik
-    <alexander.kowarik@statistik.gv.at>, Angelika Meraner
-Maintainer: Alexander Kowarik <alexander.kowarik@statistik.gv.at>
-Depends:
-    R (>= 2.14.0),stats,utils,grDevices,datasets,x12 (>= 1.1.0)
-Imports:
-    methods,Hmisc,RGtk2,
-    cairoDevice,
-    grid,
-    lattice,stringr
-Description: A graphical user interface for the x12 package
-License: GPL (>= 2)
-URL: https://github.com/alexkowa/x12GUI
-Collate:
-    'helper.R'
-    'plotgui.R'
-    'x12GUI.R'
+Package: x12GUI 
+Version: 0.9.5 
+Date: 2013-12-09 
+Title: X12 - Graphical User Interface 
+Author: Daniel Schopfhauser, Alexander Kowarik 
+    <alexander.kowarik@statistik.gv.at>, Angelika Meraner 
+Maintainer: Alexander Kowarik <alexander.kowarik@statistik.gv.at> 
+Depends: 
+    R (>= 2.14.0),stats,utils,grDevices,datasets,x12 (>= 1.1.0) 
+Imports: 
+    methods,Hmisc,RGtk2, 
+    cairoDevice, 
+    grid, 
+    lattice,stringr 
+Description: A graphical user interface for the x12 package 
+License: GPL (>= 2) 
+URL: https://github.com/alexkowa/x12GUI 
+Collate: 
+    'helper.R' 
+    'plotgui.R' 
+    'x12GUI.R' 
