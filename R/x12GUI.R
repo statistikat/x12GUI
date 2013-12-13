@@ -121,12 +121,12 @@ x12GUI <- function(x12orig,...){
 	table.model <- gtkListStore("character")
 	handler.tstable <- 0
 	
-	frame.history <- gtkFrame("History")
+	frame.history <- gtkFrame("Tracking")
 	panel.history <- gtkVBox()
 	label.history <- gtkLabel("revert to:")
 	combobox.history <- gtkComboBoxNewText()
 	button.revert <- gtkButton("Revert")
-	button.clearhistory <- gtkButton("Clean History")
+	button.clearhistory <- gtkButton("Clean Tracking")
 	count.history <- 0
 	
 	#Panels
@@ -5352,10 +5352,10 @@ x12GUI <- function(x12orig,...){
 	frame.history$Add(panel.history)
 	gSignalConnect(button.clearhistory, "released", f=function(...){
 				dialog <- gtkMessageDialog(window.main, "destroy-with-parent",
-						"warning", "yes-no", "History will be lost, do you really want to do this?")
+						"warning", "yes-no", "Tracking will be lost, do you really want to do this?")
 				res <- dialog$Run()
 				if(res==-8){
-					object@x12List[[indices[1]]] <<- cleanHistory(object@x12List[[min(indices)]])
+					object@x12List[[indices[1]]] <<- cleanTracking(object@x12List[[min(indices)]])
 					make_history()
 					update_notebook()
 				}
