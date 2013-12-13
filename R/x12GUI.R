@@ -2988,7 +2988,7 @@ x12GUI <- function(x12orig,...){
       else if(spect=="residuals")
         main <- "Spectrum of the RegARIMA Residuals"
       main <- paste(object@x12List[[indices[1]]]@tsName,"-",main)
-			plotSpec(object@x12List[[indices[1]]], which=spect,main=main)
+			plotSpec(object@x12List[[indices[1]]], which=spect,main=main,legend_bty="n",legend_horiz=FALSE)
 		}
 		if(page.num==3){
 			if(context.plot3==0){
