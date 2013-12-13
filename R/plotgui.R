@@ -13,9 +13,11 @@ plotgui <- function(x,original=TRUE,sa=FALSE,trend=FALSE,
     showAllout=FALSE,showOut=NULL,
     showCI=TRUE,
     points_original=FALSE,
-    span=c(1950,1,1964,12)
+    span=c(1950,1,1964,12),tsName=NULL
 ) 
 {
+  if(!original&&!sa&&!trend)
+    original <- TRUE
   #Parameter aus vollem Plot
   ylab="Value"
   xlab="Date"
@@ -44,28 +46,38 @@ plotgui <- function(x,original=TRUE,sa=FALSE,trend=FALSE,
       main<-main.orig <- "Original Series"
     }else{
       main<-main.orig<- "Log transformed Original Series"
-    }}
+    }
+    if(!is.null(tsName))
+      main<-main.orig <- paste(tsName,"-",main)
+  }
   if(sa){
     if(!log_transform){
       main<-"Seasonally Adjusted Series"	
     }else{
       main<-"Log transformed Seasonally Adjusted Series"
-    }}
+    }
+    if(!is.null(tsName))
+      main<- paste(tsName,"-",main)
+  }
   if(trend){
     if(!log_transform){
       main<-"Trend"	
       
     }else{
       main<-"Log transformed Trend"
-      
-    }}
+    }
+    if(!is.null(tsName))
+      main<- paste(tsName,"-",main)
+  }
   if(sa && trend  &! original){
     if(!log_transform)
       main <- "Seasonally Adjusted Series and Trend"
     else
       main <- "Log transformed Seasonally Adjusted Series and Trend"
+    if(!is.null(tsName))
+      main<- paste(tsName,"-",main)
   }
-  if(original && sa &!trend)	
+  if(original && sa &!trend)
     main <- paste(main.orig,"and Seasonally Adjusted Series")
   if(original &! sa &&trend)	
     main <- paste(main.orig,"and Trend")
@@ -110,6 +122,8 @@ plotgui <- function(x,original=TRUE,sa=FALSE,trend=FALSE,
   }
   plot(fullTs,type="n",xlim=xlim,xlab=xlab,ylab=ylab,main=main,xaxt="n")
   aT <- aL <- axTicks(1)
+  aT <- aL <- seq(from=span[1]+(span[2]-1)/12,to=span[3]+(span[4]-1)/12,length.out=length(aT))
+  aT[c(1,length(aT))] <- c(span[1]+(span[2]-1)/12,span[3]+(span[4]-1)/12)
   tp <- expand.grid(floor(xlim[1]):ceiling(xlim[2]),(0:(frequency(ts)-1))/frequency(ts))
   mm <- round(tp[,2]*frequency(ts))
   yy <- tp[,1]
@@ -354,3 +368,46 @@ plotgui <- function(x,original=TRUE,sa=FALSE,trend=FALSE,
 	invisible(eval(as.call(m)))
 }
 
+plotRsdAcfGUI <- function(x,which,main){
+  xlab="Lag"
+  ylab="ACF"
+  col_acf="darkgrey"
+  lwd_acf=4
+  col_ci="blue"
+  lt_ci=2
+  ylim="default"
+  
+  x <-x@x12Output@dg
+  if(which=="acf")
+    which <- "rsd.acf"
+  else if(which=="pacf")
+    which <- "rsd.pacf"
+  else if(which=="acf2")
+    which <- "rsd.acf2"		
+  #lwd_bar=4,plot_legend=TRUE){
+  if(which=="rsd.acf"){main2 <- "Autocorrelations of the Residuals"}
+  else if(which=="rsd.pacf"){main2 <- "Partial Autocorrelations of the Residuals"}        
+  else if(which=="rsd.acf2"){main2 <- "Autocorrelations of the Squared Residuals"}
+  main <- paste(main,"-",main2)
+  
+  if(!is.null(x[[which]])){
+    if(ylim=="default"){
+      ylim<-c(-max(abs(x[[which]][[grep("sample",names(x[[which]]),value=TRUE)]]),2*x[[which]][[grep("stderr",names(x[[which]]),value=TRUE)]]),max(abs(x[[which]][[grep("sample",names(x[[which]]),value=TRUE)]]),2*x[[which]][[grep("stderr",names(x[[which]]),value=TRUE)]]))
+    }
+    if(which=="rsd.pacf")
+      ylab="Partial ACF"
+    
+    plot(x[[which]]$lag,x[[which]][[grep("sample",names(x[[which]]),value=TRUE)]],type="h",xlab=xlab,ylab=ylab,main=main,col=col_acf,ylim=ylim,lwd=lwd_acf)
+    abline(h=0,col="black")
+    lines(x[[which]]$lag,2*x[[which]][[grep("stderr",names(x[[which]]),value=TRUE)]],type="l",col=col_ci,lty=lt_ci)
+    lines(x[[which]]$lag,-2*x[[which]][[grep("stderr",names(x[[which]]),value=TRUE)]],type="l",col=col_ci,lty=lt_ci)
+  }
+  else{
+    plot(1:10, type = "n", xaxt="n", yaxt="n", xlab="", ylab="", main=main)	 
+    text(5.5,5.5,"Not Available")
+  }
+  
+  
+  
+  
+}
