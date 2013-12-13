@@ -407,7 +407,4 @@ plotRsdAcfGUI <- function(x,which,main){
     text(5.5,5.5,"Not Available")
   }
   
-  
-  
-  
 }
