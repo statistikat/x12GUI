@@ -2997,7 +2997,7 @@ x12GUI <- function(x12orig,...){
 			}
 			if(!file)dev.set(context.plot3)
         main <- paste(object@x12List[[indices[1]]]@tsName,"-","Seasonal Factors by period and SI Ratios")
-			  plotSeasFac(object@x12List[[indices[1]]],main=main)
+			  plotSeasFac(object@x12List[[indices[1]]],main=main,legend_bty="n",legend_horiz=FALSE)
 		}
 		if(page.num==0){
 			if(context.plot4==0){
