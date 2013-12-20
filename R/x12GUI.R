@@ -3054,10 +3054,14 @@ x12GUI <- function(x12orig,...){
 	#Handler responsible for the contextmenus of the plots
 	menuhandler <- function(menuitem, userdata){
 		if(menuitem == menuitem.x12update){
-			object <<- x12(object) 
+      ##process dialog start
+      dialog <- gtkMessageDialog(window.main, "destroy-with-parent","warning","no", "Please wait, X12-ARIMA is runnning!")
+      object <<- x12(object) 
 			update_notebook(reset=FALSE)
 			update_outliertable()
 			make_history()
+      dialog$destroy()
+    ##process dialog end
 		}
 		
 		if(menuitem == menuitem.saveaspdf || menuitem == menuitem.saveaspdfwithoutlier || menuitem == menuitem.expplotaspdf){
