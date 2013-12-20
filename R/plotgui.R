@@ -406,7 +406,6 @@ plotRsdAcfGUI <- function(x,which,main){
       axis(side=1,at=aT)
     }
     abline(h=0,col="black")
-    print(x)
     lines(x[[which]]$lag,2*x[[which]][[grep("stderr",names(x[[which]]),value=TRUE)]],type="l",col=col_ci,lty=lt_ci)
     lines(x[[which]]$lag,-2*x[[which]][[grep("stderr",names(x[[which]]),value=TRUE)]],type="l",col=col_ci,lty=lt_ci)
   }
