@@ -163,7 +163,6 @@ x12GUI <- function(x12orig,...){
 	menuitem.addAO <- gtkMenuItemNewWithLabel("Add AO Outlier (Regression must be active)")
 	menuitem.addTC <- gtkMenuItemNewWithLabel("Add TC Outlier (Regression must be active)")
 	menuitem.addLS <- gtkMenuItemNewWithLabel("Add LS Outlier (Regression must be active)")
-	mm <<- menuitem.addLS
 	
 	#plotslider
 	slider.plotmin <- gtkHScale(min = 0, max= 100, step=5)

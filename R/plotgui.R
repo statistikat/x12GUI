@@ -398,7 +398,7 @@ plotRsdAcfGUI <- function(x,which,main){
       ylab="Partial ACF"
     
     plot(x[[which]]$lag,x[[which]][[grep("sample",names(x[[which]]),value=TRUE)]],type="h",xlab=xlab,ylab=ylab,main=main,col=col_acf,ylim=ylim,lwd=lwd_acf,xaxt="n")
-    if(frequency(s@ts)==12){
+    if(frequency(x@ts)==12){
       aT <- c(6,12,18,24)
       axis(side=1,at=aT)  
     }else{
