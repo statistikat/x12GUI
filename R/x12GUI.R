@@ -40,6 +40,7 @@
 #' @import x12
 #' @export x12GUI
 x12GUI <- function(x12orig,...){
+  tmpfsink <- tempfile()##tmpfile for catching the output to the console of x12
   window.main <- gtkWindow("x12 GUI")
   if(existd("x12path")==FALSE){
     dialog <- gtkMessageDialog(window.main, "destroy-with-parent",
@@ -3054,14 +3055,27 @@ x12GUI <- function(x12orig,...){
 	#Handler responsible for the contextmenus of the plots
 	menuhandler <- function(menuitem, userdata){
 		if(menuitem == menuitem.x12update){
-      ##process dialog start
-      dialog <- gtkMessageDialog(window.main, "destroy-with-parent","warning","no", "Please wait, X12-ARIMA is runnning!")
-      object <<- x12(object) 
-			update_notebook(reset=FALSE)
-			update_outliertable()
-			make_history()
-      dialog$destroy()
-    ##process dialog end
+      dialog <- gtkMessageDialog(window.main, "destroy-with-parent","warning","none", "Please wait, X12-ARIMA is runnning!")
+      sink(tmpfsink)
+      tt <- try(object <<- x12(object))
+      sink()
+      
+      runOutput <- readLines(tmpfsink)
+      runOutput <- runOutput[runOutput!=" "]
+      if(length(grep("ERROR",runOutput))>0){
+        dialog$destroy()
+        runOutput <- paste(runOutput,collapse="\n")
+        dialog <- gtkMessageDialog(window.main, "destroy-with-parent","error","cancel", runOutput)
+        if(dialog$run()){
+          dialog$destroy()
+        }
+      }else{
+			  update_notebook(reset=FALSE)
+			  update_outliertable()
+			  make_history()
+        dialog$destroy()
+      }
+    
 		}
 		
 		if(menuitem == menuitem.saveaspdf || menuitem == menuitem.saveaspdfwithoutlier || menuitem == menuitem.expplotaspdf){
