@@ -856,7 +856,6 @@ x12GUI <- function(x12orig,...){
 		}
 		#regression
 		if(togglebutton == checkb.regressionactive){
-      
 # 		  toggle(c(checkb.acceptdefault, checkb.balanced, checkb.maxorderactive, checkb.maxdiffactive,
 # 		           entry.maxorder1, entry.maxdiff1), togglebutton)
 		  if(togglebutton$GetActive()==TRUE) {
@@ -1256,15 +1255,20 @@ x12GUI <- function(x12orig,...){
 		}
 		#x11regress
 		if(togglebutton == radiob.x11regression){
+		  regression[indices] <<- TRUE
 			if(togglebutton$GetActive()==TRUE){
         lapply(indices, FUN=function(s){object <<- setP(object,list(x11regression=TRUE),s)})
+        entry.aictest$SetText("")
         entry.aictest$SetSensitive(FALSE)
         checkb.aictestactive$SetSensitive(FALSE)
+        checkb.aictestactive$SetActive(FALSE)
 			}
 			else{
 			  lapply(indices, FUN=function(s){object <<- setP(object,list(x11regression=FALSE),s)}) 
+			  entry.aictest$SetText("")
 			  entry.aictest$SetSensitive(FALSE)
 			  checkb.aictestactive$SetSensitive(TRUE)
+			  checkb.aictestactive$SetActive(FALSE)
 			}
 			status_print("x11regression changed!")
 			togglebutton$SetInconsistent(FALSE)
@@ -1315,6 +1319,7 @@ x12GUI <- function(x12orig,...){
     
 		#centeruser
 		if(widget == combobox.centeruser){
+		  regression[indices] <<- TRUE
 			if(widget$GetActive()==0)lapply(indices, FUN=function(s){object <<- setP(object,list(regression.centeruser="mean"),s)})
 			if(widget$GetActive()==1)lapply(indices, FUN=function(s){object <<- setP(object,list(regression.centeruser="seasonal"),s)})
 			status_print("regression.centeruser changed!")
@@ -1738,6 +1743,7 @@ x12GUI <- function(x12orig,...){
 		    status_print("regression.variables changed!")
 		  }
 		  else{
+		    regression[indices] <<- TRUE
 		    gSignalEmit(entry.regvariables, "changed")
 		  }
 		}
@@ -1750,6 +1756,7 @@ x12GUI <- function(x12orig,...){
 				if(system==FALSE)status_print("regression.user changed!")
 			}
 			else{
+			  regression[indices] <<- TRUE
 				gSignalEmit(entry.reguser, "changed")
 			}
 		}
@@ -1760,6 +1767,9 @@ x12GUI <- function(x12orig,...){
         button$SetInconsistent(FALSE)
         lapply(indices, FUN=function(s){object <<- setP(object,list(regression.file=NULL),s)})
         if(system==FALSE)status_print("regression.file changed!")
+      }
+      else{
+        regression[indices] <<- TRUE
       }
 		}
     #Regression END
@@ -2294,6 +2304,7 @@ x12GUI <- function(x12orig,...){
 				button$SetInconsistent(FALSE)
 				lapply(indices, FUN=function(s){object <<- setP(object,list(regression.aictest=NULL),s)})
         entry.aictest$SetText("")
+        entry.aictest$SetSensitive(FALSE)
 				if(system==FALSE)status_print("regression.aictest changed!")
 			}
 			else{
@@ -2697,6 +2708,7 @@ x12GUI <- function(x12orig,...){
 		
 		if(editable==entry.aictest){
 			if(!isEmpty(text) && trim(text) != "*"){
+			  regression[indices] <<- TRUE
 				lapply(indices, FUN=function(s){object <<- setP(object,list(regression.aictest=(text)),s)})
 				status_print("regression.aictest changed!")
 			}
@@ -2800,6 +2812,7 @@ x12GUI <- function(x12orig,...){
 			text <- entry.regfilestartstartyear$GetChars(0, -1)
 			text2 <- entry.regfilestartstartperiod$GetChars(0, -1)
 			if(isNumber(text)&&isPeriod(text2)){
+			  regression[indices] <<- TRUE
 				lapply(indices, FUN=function(s){object <<- setP(object,list(regression.start=c(text, text2)),s)})
 				status_print("regression.start changed!")
 			}
@@ -3522,8 +3535,10 @@ x12GUI <- function(x12orig,...){
                              "x11.trendma", "x11.appendfcst", "x11.appendbcst",
 	                           "x11.calendarsigma", "x11.excludefcst", "x11.final", "x11regression"))
 		v <- v[selected]
-    regression[selected] <<- sapply(v[selected],function(x)any(!sapply(x[c("regression.variables", "regression.user", "regression.file")],is.null)))
-	  vreg <- regression[selected]
+    #regression[selected] <<- sapply(v[selected],function(x)any(!sapply(x[c("regression.variables", "regression.user", "regression.file")],is.null)))
+	  
+    vreg <- regression[selected]
+	  status_print(cat(vreg))
 		####span
 		gSignalHandlerBlock(entry.spanstartyear, handler.spanstartyear)
 		gSignalHandlerBlock(entry.spanstartperiod, handler.spanstartperiod)
@@ -3573,6 +3588,107 @@ x12GUI <- function(x12orig,...){
 		gSignalHandlerUnblock(entry.spanstartperiod, handler.spanstartperiod)
 		gSignalHandlerUnblock(entry.spanendyear, handler.spanendyear)
 		gSignalHandlerUnblock(entry.spanendperiod, handler.spanendperiod)
+	  
+	  ###regression
+	  #not really a x12-parameter but a variable inside the gui that works like a
+	  #virtual x12-parameter i.e. its at startup FALSE for all time series and can be changed
+	  #with the regression checkbox
+	  gSignalHandlerBlock(checkb.regressionactive, handler.regressionactive)
+	  if(length(unique(vreg))==1){
+	    checkb.regressionactive$SetInconsistent(FALSE)
+	    if(vreg[[1]]==TRUE){
+	      checkb.regressionactive$SetActive(TRUE)
+	    }else {
+	      checkb.regressionactive$SetActive(FALSE)
+	      radiob.regression$SetActive(TRUE) 
+	      radiob.x11regression$SetActive(FALSE)
+	    }
+	    #removes the possibility to add manual outlier if the regression is not active
+	    #would lead to some questionable situations
+	    toggle(c(menuitem.addAO, menuitem.addLS, menuitem.addTC, 
+	             button.manualoutlieraddclick, button.manualoutlieradd), checkb.regressionactive)
+	    toggle(c(radiob.regression, radiob.x11regression,
+	             checkb.regvariablesactive, 
+	             checkb.reguseractive, 
+	             checkb.regfileactive, 
+	             checkb.usertypeactive, 
+	             checkb.centeruseractive, 
+	             checkb.regfilestartactive, 
+	             checkb.aictestactive), checkb.regressionactive)
+	  }
+	  else{
+	    checkb.regressionactive$SetInconsistent(TRUE)
+	    checkb.regressionactive$SetActive(TRUE)
+	    toggle(c(menuitem.addAO, menuitem.addLS, menuitem.addTC, 
+	             button.manualoutlieraddclick, button.manualoutlieradd), checkb.regressionactive)
+	    toggle(c(radiob.regression, radiob.x11regression,
+	             checkb.regvariablesactive, 
+	             checkb.reguseractive, 
+	             checkb.regfileactive, 
+	             checkb.usertypeactive, 
+	             checkb.centeruseractive, 
+	             checkb.regfilestartactive, 
+	             checkb.aictestactive), checkb.regressionactive)
+	    update_toggle(checkb.regressionactive)
+	  }
+	  gSignalHandlerUnblock(checkb.regressionactive, handler.regressionactive)
+    
+	  ###x11regress
+	  gSignalHandlerBlock(radiob.x11regression, handler.x11regression)
+	  allowAIC <- FALSE
+	  if(length(unique(lapply(v, FUN=function(s){s$x11regression})))==1){
+	    radiob.x11regression$SetInconsistent(FALSE)
+	    radiob.regression$SetInconsistent(FALSE)
+	    if(vreg[1]==TRUE){
+	      if(v[[1]]$x11regression==TRUE){
+	        radiob.x11regression$SetActive(TRUE)
+	        radiob.regression$SetActive(FALSE)
+	        entry.aictest$SetSensitive(FALSE)
+	        checkb.aictestactive$SetSensitive(FALSE)
+	      }
+	      else{
+	        radiob.regression$SetActive(TRUE) 
+	        radiob.x11regression$SetActive(FALSE)
+	        allowAIC <- TRUE
+	        #entry.aictest$SetSensitive(FALSE)
+	        checkb.aictestactive$SetSensitive(TRUE)
+	      }
+	    }
+	  }
+	  else{
+	    radiob.x11regression$SetInconsistent(TRUE)
+	    radiob.regression$SetInconsistent(TRUE)
+	  }
+	  gSignalHandlerUnblock(radiob.x11regression, handler.x11regression)
+	  
+    
+	  ###aictest
+	  gSignalHandlerBlock(entry.aictest, handler.aictest)
+	  if(length(unique(lapply(v, FUN=function(s){s$regression.aictest})))==1){
+	    if(is.null(v[[1]]$regression.aictest)|| vreg[[1]]==FALSE){
+	      checkb.aictestactive$SetInconsistent(FALSE)
+	      checkb.aictestactive$SetActive(FALSE)
+	      entry.aictest$SetText("")
+	      entry.aictest$SetSensitive(FALSE)
+	      #update_toggle(checkb.aictestactive)
+	    }
+	    else{
+	      if (allowAIC){
+	        checkb.aictestactive$SetInconsistent(FALSE)
+	        checkb.aictestactive$SetActive(TRUE)
+	        entry.aictest$SetSensitive(TRUE)
+	        #update_toggle(checkb.aictestactive)
+	        entry.aictest$SetText(concParam((v[[1]]$regression.aictest)))
+	      }
+	    }
+	  }
+	  else{
+	    entry.aictest$SetText("*")
+	    checkb.aictestactive$SetActive(TRUE)
+	    checkb.aictestactive$SetInconsistent(TRUE)
+	    update_toggle(checkb.aictestactive)
+	  }
+	  gSignalHandlerUnblock(entry.aictest, handler.aictest)
 		
 		###modelspan
 		gSignalHandlerBlock(entry.modelspanstartyear, handler.modelspanstartyear)
@@ -4184,38 +4300,7 @@ x12GUI <- function(x12orig,...){
 		}
 		gSignalHandlerUnblock(entry.maxdiff1, handler.maxdiff1)
 	  gSignalHandlerUnblock(entry.maxdiff2, handler.maxdiff2)
-		
-	  ###regression
-    #not really a x12-parameter but a variable inside the gui that works like a
-    #virtual x12-parameter i.e. its at startup FALSE for all time series and can be changed
-    #with the regression checkbox
-	  gSignalHandlerBlock(checkb.regressionactive, handler.regressionactive)
-	  if(length(unique(vreg))==1){
-	    checkb.regressionactive$SetInconsistent(FALSE)
-	    if(vreg[[1]]==TRUE){
-	      checkb.regressionactive$SetActive(TRUE)
-	    }else {
-	      checkb.regressionactive$SetActive(FALSE)
-	    }
-	    #removes the possibility to add manual outlier if the regression is not active
-	    #would lead to some questionable situations
-	    toggle(c(menuitem.addAO, menuitem.addLS, menuitem.addTC, 
-	             button.manualoutlieraddclick, button.manualoutlieradd), checkb.regressionactive)
-	    toggle(c(radiob.regression, radiob.x11regression,
-	             checkb.regvariablesactive, 
-	             checkb.reguseractive, 
-	             checkb.regfileactive, 
-	             checkb.usertypeactive, 
-	             checkb.centeruseractive, 
-	             checkb.regfilestartactive, 
-	             checkb.aictestactive), checkb.regressionactive)
-	  }
-	  else{
-	    checkb.regressionactive$SetInconsistent(TRUE)
-      checkb.regressionactive$SetActive(TRUE)
-      update_toggle(checkb.regressionactive)
-	  }
-	  gSignalHandlerUnblock(checkb.regressionactive, handler.regressionactive)
+    
 		###regvariables
 		gSignalHandlerBlock(entry.regvariables, handler.regvariables)
 		if(length(unique(lapply(v, FUN=function(s){s$regression.variables})))==1){
@@ -4677,30 +4762,7 @@ x12GUI <- function(x12orig,...){
 		}
 		gSignalHandlerUnblock(entry.backcast_years, handler.backcast_years)
 		
-		###aictest
-		gSignalHandlerBlock(entry.aictest, handler.aictest)
-		if(length(unique(lapply(v, FUN=function(s){s$regression.aictest})))==1){
-			if(is.null(v[[1]]$regression.aictest)|| vreg[[1]]==FALSE){
-				checkb.aictestactive$SetInconsistent(FALSE)
-				checkb.aictestactive$SetActive(FALSE)
-				entry.aictest$SetText("")
-				update_toggle(checkb.aictestactive)
-			}
-			else{
-				checkb.aictestactive$SetInconsistent(FALSE)
-				checkb.aictestactive$SetActive(TRUE)
-				update_toggle(checkb.aictestactive)
-				entry.aictest$SetText(concParam((v[[1]]$regression.aictest)))
-			}
-		}
-		else{
-			entry.aictest$SetText("*")
-			checkb.aictestactive$SetActive(TRUE)
-			checkb.aictestactive$SetInconsistent(TRUE)
-			update_toggle(checkb.aictestactive)
-		}
-		gSignalHandlerUnblock(entry.aictest, handler.aictest)
-		
+	
 		###seasonalma
 		gSignalHandlerBlock(entry.seasonalma, handler.seasonalma)
 		if(length(unique(lapply(v, FUN=function(s){s$x11.seasonalma})))==1){
@@ -5226,31 +5288,7 @@ x12GUI <- function(x12orig,...){
 		}
 		gSignalHandlerUnblock(checkb.x11excludefcst, handlercheckb.x11excludefcst)
 		
-		###x11regress
-		gSignalHandlerBlock(radiob.x11regression, handler.x11regression)
-		if(length(unique(lapply(v, FUN=function(s){s$x11regression})))==1){
-			radiob.x11regression$SetInconsistent(FALSE)
-			radiob.regression$SetInconsistent(FALSE)
-      if(vreg[1]==TRUE){
-        if(v[[1]]$x11regression==TRUE){
-          radiob.x11regression$SetActive(TRUE)
-          radiob.regression$SetActive(FALSE)
-          entry.aictest$SetSensitive(FALSE)
-          checkb.aictestactive$SetSensitive(FALSE)
-        }
-        else{
-          radiob.regression$SetActive(TRUE) 
-          radiob.x11regression$SetActive(FALSE)
-          entry.aictest$SetSensitive(TRUE)
-          checkb.aictestactive$SetSensitive(TRUE)
-        }
-      }
-		}
-		else{
-		  radiob.x11regression$SetInconsistent(FALSE)
-		  radiob.regression$SetInconsistent(FALSE)
-		}
-		gSignalHandlerUnblock(radiob.x11regression, handler.x11regression)
+	  
 		
 		make_history()
 	}
