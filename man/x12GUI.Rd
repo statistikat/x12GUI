@@ -46,4 +46,8 @@ b <- x12GUI(b)
   \code{\linkS4class{x12BaseInfo}}, \code{\link{summary}},
   %\code{\link{summary.x12}}, \code{\link{x12work}}
 }
-
+\references{Alexander Kowarik, Angelika Meraner, Matthias Templ, Daniel
+  Schopfhauser (2014). Seasonal Adjustment with the R Packages x12 and
+  x12GUI. Journal of Statistical Software, 62(2), 1-21. URL
+  http://www.jstatsoft.org/v62/i02/.
+}
