@@ -7,3 +7,9 @@ import(grid)
 import(Hmisc)
 import(lattice)
 import(stringr)
+importFrom("grDevices", "dev.cur", "dev.off", "dev.set", "pdf", "png")
+importFrom("graphics", "abline", "axTicks", "axis", "lines", "par",
+           "points", "polygon", "text")
+importFrom("stats", "end", "frequency", "na.omit", "start", "time",
+           "tsp", "window")
+importFrom("utils", "capture.output", "write.csv2")

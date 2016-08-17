@@ -1,6 +1,6 @@
 Package: x12GUI         
-Version: 0.13.0 
-Date: 2014-11-19 
+Version: 0.13.1
+Date: 2016-18-17 
 Title: X12 - Graphical User Interface         
 Author: Daniel Schopfhauser, Alexander Kowarik         
     <alexander.kowarik@statistik.gv.at>, Angelika Meraner         
@@ -11,8 +11,8 @@ Imports:
     methods,Hmisc,RGtk2,         
     cairoDevice,         
     grid,         
-    lattice,stringr         
-Description: A graphical user interface for the x12 package         
+    lattice,stringr,graphics     
+Description: A graphical user interface for the x12 R-package which provides capabilities for changing parameters of X12-ARIMA and creating several plots.          
 License: GPL (>= 2)         
 URL: https://github.com/statistikat/x12GUI         
 Collate:         
